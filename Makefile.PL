@@ -7,10 +7,10 @@ perl_version '5.006';
 requires 'CHI'    => 0;
 requires 'Cache::Memcached::Fast'    => 0;
 
-build_requires 'Date::Parse' => 0;
 build_requires 'Test::Class' => 0;
 build_requires 'Test::Deep'  => 0;
 build_requires 'Test::More'  => 0;
+build_requires 'Test::Builder'  => 0;
 
 license 'perl';
 
