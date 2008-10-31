@@ -2,9 +2,19 @@ use inc::Module::Install;
 name 'CHI-Driver-MemcachedFast';
 all_from 'lib/CHI/Driver/MemcachedFast.pm';
 
-requires $_ for (qw/ /);
+perl_version '5.006';
 
-build_requires 'Test::More';
-use_test_base;
-auto_include;
+requires 'CHI'    => 0;
+requires 'Cache::Memcached::Fast'    => 0;
+
+build_requires 'Date::Parse' => 0;
+build_requires 'Test::Class' => 0;
+build_requires 'Test::Deep'  => 0;
+build_requires 'Test::More'  => 0;
+
+license 'perl';
+
+auto_install;
+
 WriteAll;
+
