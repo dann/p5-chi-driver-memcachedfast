@@ -1,4 +1,6 @@
 package CHI::Driver::MemcachedFast;
+
+our $VERSION = '0.01';
 use Cache::Memcached::Fast;
 use Carp;
 use Moose;
