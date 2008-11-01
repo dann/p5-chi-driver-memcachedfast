@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
 use warnings;
-use lib 't/lib';
-use CHI::t::Driver::MemcachedFast;
-CHI::t::Driver::MemcachedFast->runtests;
+use CHI::Driver::MemcachedFast::t::CHIDriverTests;
+CHI::Driver::MemcachedFast::t::CHIDriverTests->runtests;
+

@@ -1,93 +1,17 @@
 package CHI::Driver::MemcachedFast;
-
-our $VERSION = '0.01';
-use Cache::Memcached::Fast;
-use Carp;
 use Moose;
-use strict;
-use warnings;
+use Cache::Memcached::Fast;
+our $VERSION = '0.02';
 
-extends 'CHI::Driver::Base::CacheContainer';
+extends 'CHI::Driver::Memcached';
 
-has 'compress_threshold' => ( is => 'ro' );
-has 'debug'              => ( is => 'ro' );
-has 'memd'               => ( is => 'ro' );
-has 'no_rehash'          => ( is => 'ro' );
-has 'servers'            => ( is => 'ro' );
-has 'readonly'           => ( is => 'ro' );
-
-has 'connect_timeout'   => ( is => 'ro' );
-has 'io_timeout'        => ( is => 'ro' );
-has 'close_on_error'    => ( is => 'ro' );
-has 'compress_ratio '   => ( is => 'ro' );
-has 'compress_methods'  => ( is => 'ro' );
-has 'max_failures'      => ( is => 'ro' );
-has 'failure_timeout'   => ( is => 'ro' );
-has 'ketama_points'     => ( is => 'ro' );
-has 'nowait'            => ( is => 'ro' );
-has 'hash_namespace'    => ( is => 'ro' );
-has 'serialize_methods' => ( is => 'ro' );
-has 'utf8'              => ( is => 'ro' );
-has 'max_size'          => ( is => 'ro' );
-has 'check_args'        => ( is => 'ro' );
+override '_build_contained_cache' => sub {
+    my ($self) = @_;
+    return Cache::Memcached::Fast->new( $self->{mc_params} );
+};
 
 __PACKAGE__->meta->make_immutable();
-
-sub BUILD {
-    my ( $self, $params ) = @_;
-
-    my %mc_params = (
-        map { exists( $self->{$_} ) ? ( $_, $self->{$_} ) : () }
-            qw(compress_threshold debug namespace no_rehash servers
-            connect_timeout io_timeout close_on_error compress_ratio
-            compress_methods max_failures failure_timeout ketama_points
-            nowait hash_namespace serialize_methods utf8 max_size check_args
-            )
-    );
-    $self->{_contained_cache} = $self->{memd}
-        = Cache::Memcached::Fast->new( \%mc_params );
-}
-
-sub clear {
-    my ($self) = @_;
-
-    $self->{_contained_cache}->flush_all();
-}
-
-# Memcached supports fast multiple get
-#
-
-sub get_multi_hashref {
-    my ( $self, $keys ) = @_;
-    croak "must specify keys" unless defined($keys);
-
-    my $keyvals = $self->{memd}->get_multi(@$keys);
-    foreach my $key ( keys(%$keyvals) ) {
-        if ( defined $keyvals->{$key} ) {
-            $keyvals->{$key} = $self->get( $key, data => $keyvals->{$key} );
-        }
-    }
-    return $keyvals;
-}
-
-sub get_multi_arrayref {
-    my ( $self, $keys ) = @_;
-    croak "must specify keys" unless defined($keys);
-
-    my $keyvals = $self->get_multi_hashref($keys);
-    return [ map { $keyvals->{$_} } @$keys ];
-}
-
-# Not supported
-#
-
-sub get_keys {
-    croak "get_keys not supported for " . __PACKAGE__;
-}
-
-sub get_namespaces {
-    croak "get_namespaces not supported for " . __PACKAGE__;
-}
+no Moose;
 
 1;
 
